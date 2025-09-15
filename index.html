@@ -3,17 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tourist Guide Chat</title>
+  <title>Tourist Guide</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="chat-container">
-    <h1>🌍 Tourist Guide</h1>
-    <div id="chat-box" class="chat-box"></div>
-    <div class="input-container">
-      <input type="text" id="user-input" placeholder="Ask about tourist places...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
+    <header class="chat-header">
+      Tourist Guide
+    </header>
+
+    <main id="messages" class="chat-messages"></main>
+
+    <footer class="chat-footer">
+      <input type="text" id="userInput" placeholder="Ask me anything..." />
+      <button id="sendBtn">Send</button>
+    </footer>
   </div>
   <script src="script.js"></script>
 </body>

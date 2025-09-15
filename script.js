@@ -1,50 +1,43 @@
-const webhookUrl = "https://farhanayasmeen.app.n8n.cloud/webhook/tourist-guide";
+const webhookUrl = "https://farhanayasmeen.app.n8n.cloud/webhook/tourist-guide"; // Production URL
+
+const messagesDiv = document.getElementById("messages");
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+
+sendBtn.addEventListener("click", sendMessage);
+userInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
+
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;  // Correct syntax
+  msg.textContent = text;
+  messagesDiv.appendChild(msg);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 
 async function sendMessage() {
-  const input = document.getElementById("user-input");
-  const chatBox = document.getElementById("chat-box");
-  const message = input.value.trim();
-
+  const message = userInput.value.trim();
   if (!message) return;
 
-  // Show user message
-  const userMsg = document.createElement("div");
-  userMsg.classList.add("message", "user");
-  userMsg.textContent = message;
-  chatBox.appendChild(userMsg);
-
-  // Clear input
-  input.value = "";
-
-  // Add loading bubble
-  const loadingMsg = document.createElement("div");
-  loadingMsg.classList.add("message", "bot");
-  loadingMsg.textContent = "⏳ Loading...";
-  chatBox.appendChild(loadingMsg);
-  chatBox.scrollTop = chatBox.scrollHeight;
+  addMessage(message, "user");
+  userInput.value = "";
+  sendBtn.disabled = true;
 
   try {
-    const response = await fetch(webhookUrl, {
+    const res = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatInput: message })
+      body: JSON.stringify({ chatInput: message }),
     });
 
-    const data = await response.json();
-    loadingMsg.remove();
-
-    const botMsg = document.createElement("div");
-    botMsg.classList.add("message", "bot");
-    botMsg.textContent = data.output || "Sorry, no response.";
-    chatBox.appendChild(botMsg);
-  } catch (error) {
-    loadingMsg.remove();
-
-    const botMsg = document.createElement("div");
-    botMsg.classList.add("message", "bot");
-    botMsg.textContent = "⚠️ Error connecting to the server.";
-    chatBox.appendChild(botMsg);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const data = await res.json();
+    addMessage(data.output || data.body || JSON.stringify(data), "bot");
+  } catch (err) {
+    addMessage("Error: " + err.message, "bot");
+  } finally {
+    sendBtn.disabled = false;
   }
-
-  chatBox.scrollTop = chatBox.scrollHeight;
 }
